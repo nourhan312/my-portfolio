@@ -1,0 +1,261 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import '../../../../core/extensions/context_extensions.dart';
+import '../cubit/portfolio_cubit.dart';
+import '../cubit/portfolio_state.dart';
+import '../widgets/achievements_section.dart';
+import '../widgets/contact_section.dart';
+import '../widgets/education_section.dart';
+import '../widgets/experience_section.dart';
+import '../widgets/hero_section.dart';
+import '../widgets/portfolio_navbar.dart';
+import '../widgets/projects_section.dart';
+import '../widgets/skills_section.dart';
+
+class PortfolioPage extends StatefulWidget {
+  const PortfolioPage({super.key});
+
+  @override
+  State<PortfolioPage> createState() => _PortfolioPageState();
+}
+
+class _PortfolioPageState extends State<PortfolioPage> {
+  final _scrollController = ScrollController();
+
+  // Section keys for scroll-to navigation
+  final _heroKey = GlobalKey();
+  final _skillsKey = GlobalKey();
+  final _experienceKey = GlobalKey();
+  final _projectsKey = GlobalKey();
+  final _contactKey = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<PortfolioCubit>().load();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollTo(String section) {
+    final key = switch (section) {
+      'About' => _heroKey,
+      'Skills' => _skillsKey,
+      'Experience' => _experienceKey,
+      'Projects' => _projectsKey,
+      'Contact' => _contactKey,
+      _ => _heroKey,
+    };
+
+    final ctx = key.currentContext;
+    if (ctx == null) return;
+    Scrollable.ensureVisible(
+      ctx,
+      duration: const Duration(milliseconds: 600),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Stack(
+        children: [
+          // Main scroll content
+          _PortfolioBody(
+            scrollController: _scrollController,
+            heroKey: _heroKey,
+            skillsKey: _skillsKey,
+            experienceKey: _experienceKey,
+            projectsKey: _projectsKey,
+            contactKey: _contactKey,
+          ),
+
+          // Navbar pinned on top — only theme toggle needs Bloc access
+          Positioned(
+            top: 0, left: 0, right: 0,
+            child: BlocSelector<PortfolioCubit, PortfolioState, bool>(
+              selector: (state) =>
+                  state is PortfolioLoaded && state.isDark,
+              builder: (context, isDark) => PortfolioNavBar(
+                isDark: isDark,
+                onThemeToggle: () =>
+                    context.read<PortfolioCubit>().toggleTheme(),
+                onNavTap: _scrollTo,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Body — separated to keep build() lean ────────────────────────────────────
+
+class _PortfolioBody extends StatelessWidget {
+  final ScrollController scrollController;
+  final GlobalKey heroKey;
+  final GlobalKey skillsKey;
+  final GlobalKey experienceKey;
+  final GlobalKey projectsKey;
+  final GlobalKey contactKey;
+
+  const _PortfolioBody({
+    required this.scrollController,
+    required this.heroKey,
+    required this.skillsKey,
+    required this.experienceKey,
+    required this.projectsKey,
+    required this.contactKey,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<PortfolioCubit, PortfolioState>(
+      builder: (context, state) {
+        return switch (state) {
+          PortfolioInitial() || PortfolioLoading() => const _LoadingView(),
+          PortfolioError(:final message) => _ErrorView(message: message),
+          PortfolioLoaded(:final data) => SingleChildScrollView(
+              controller: scrollController,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Offset for navbar height
+                  const SizedBox(height: 60),
+
+                  SizedBox(key: heroKey, child: HeroSection(data: data)),
+                  SizedBox(
+                    key: skillsKey,
+                    child: SkillsSection(skills: data.skills),
+                  ),
+                  SizedBox(
+                    key: experienceKey,
+                    child: ExperienceSection(experiences: data.experiences),
+                  ),
+                  SizedBox(
+                    key: projectsKey,
+                    child: ProjectsSection(projects: data.projects),
+                  ),
+                  EducationSection(data: data),
+                  AchievementsSection(achievements: data.achievements),
+                  SizedBox(
+                    key: contactKey,
+                    child: ContactSection(data: data),
+                  ),
+                  _Footer(),
+                ],
+              ),
+            ),
+        };
+      },
+    );
+  }
+}
+
+class _LoadingView extends StatelessWidget {
+  const _LoadingView();
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return SizedBox(
+      height: MediaQuery.sizeOf(context).height,
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircularProgressIndicator(color: colors.accent, strokeWidth: 2),
+            const SizedBox(height: 16),
+            Text(
+              'Loading portfolio...',
+              style: GoogleFonts.dmSans(
+                fontSize: 14,
+                color: colors.textHint,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ErrorView extends StatelessWidget {
+  final String message;
+  const _ErrorView({required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return SizedBox(
+      height: MediaQuery.sizeOf(context).height,
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.error_outline, color: colors.accent, size: 40),
+            const SizedBox(height: 12),
+            Text(
+              message,
+              style: GoogleFonts.dmSans(
+                fontSize: 14,
+                color: colors.textSecondary,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            TextButton(
+              onPressed: () => context.read<PortfolioCubit>().load(),
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _Footer extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final isMobile = context.isMobile;
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: isMobile ? 24 : 80,
+        vertical: 24,
+      ),
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: colors.border)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            '© 2025 Nourhan Ayman · Flutter Developer · Banha, Egypt',
+            style: GoogleFonts.dmSans(
+              fontSize: 12,
+              color: colors.textHint,
+            ),
+          ),
+          if (!isMobile)
+            Text(
+              'Built with Flutter 💙',
+              style: GoogleFonts.dmSans(
+                fontSize: 12,
+                color: colors.textHint,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
