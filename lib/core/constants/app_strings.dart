@@ -3,7 +3,7 @@ abstract final class AppStrings {
   static const available = 'Available for opportunities';
   static const heroTitle1 = 'Flutter';
   static const heroTitle2 = 'Developer &';
-  static const heroTitle3 = 'Instructor';
+  static const heroTitle3 = 'CS Graduate';
 }
 
 abstract final class AppSections {

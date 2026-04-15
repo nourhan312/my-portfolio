@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/extensions/context_extensions.dart';
+import '../../../../core/widgets/reveal_on_scroll.dart';
 import '../../../../core/widgets/section_header.dart';
 import '../../domain/entities/portfolio_entities.dart';
 
@@ -14,6 +14,12 @@ class AchievementsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isMobile = context.isMobile;
+    final cols = isMobile ? 1 : 2;
+
+    final rows = <List<Achievement>>[];
+    for (var i = 0; i < achievements.length; i += cols) {
+      rows.add(achievements.sublist(i, (i + cols).clamp(0, achievements.length)));
+    }
 
     return Padding(
       padding: EdgeInsets.symmetric(
@@ -23,36 +29,46 @@ class AchievementsSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SectionHeader(
-            label: 'Recognition & Community',
-            titlePlain: 'Achievements &',
-            titleAccent: 'Volunteering',
-          ).animate().fadeIn(duration: 500.ms).slideY(begin: 0.2, end: 0),
-
-          const SizedBox(height: 40),
-
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final cols =
-                  constraints.maxWidth > 700 ? 2 : 1;
-              return GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: cols,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                  childAspectRatio: isMobile ? 3.5 : 4,
-                ),
-                itemCount: achievements.length,
-                itemBuilder: (context, i) =>
-                    _AchievementCard(achievement: achievements[i])
-                        .animate()
-                        .fadeIn(delay: (i * 80).ms, duration: 400.ms)
-                        .slideX(begin: 0.05, end: 0),
-              );
-            },
+          RevealOnScroll(
+            key: const ValueKey('ach-header'),
+            slideY: 0.05,
+            child: const SectionHeader(
+              label: 'Recognition & Community',
+              titlePlain: 'Achievements &',
+              titleAccent: 'Volunteering',
+            ),
           ),
+          const SizedBox(height: 40),
+          ...rows.asMap().entries.map((rowEntry) {
+            final rowIndex = rowEntry.key;
+            final row = rowEntry.value;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: row.asMap().entries.map((cardEntry) {
+                  final cardIndex = cardEntry.key;
+                  final globalIndex = rowIndex * cols + cardIndex;
+                  return Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        left: cardIndex == 0 ? 0 : 8,
+                        right: cardIndex == row.length - 1 ? 0 : 8,
+                      ),
+                      child: RevealOnScroll(
+                        key: ValueKey('ach-card-$globalIndex'),
+                        delay: Duration(milliseconds: globalIndex * 80),
+                        slideY: 0.04,
+                        child: _AchievementCard(
+                          achievement: cardEntry.value,
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            );
+          }),
         ],
       ),
     );
@@ -78,11 +94,10 @@ class _AchievementCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(achievement.icon, style: const TextStyle(fontSize: 22)),
-          const SizedBox(width: 16),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   achievement.title,
@@ -101,8 +116,6 @@ class _AchievementCard extends StatelessWidget {
                     color: colors.textHint,
                     height: 1.5,
                   ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),

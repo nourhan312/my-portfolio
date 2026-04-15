@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/extensions/context_extensions.dart';
+import '../../../../core/widgets/reveal_on_scroll.dart';
 import '../../../../core/widgets/section_header.dart';
 import '../../../../core/widgets/skill_tag_chip.dart';
 import '../../domain/entities/portfolio_entities.dart';
@@ -16,6 +16,8 @@ class ProjectsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isMobile = context.isMobile;
+    final isTablet = context.isTablet;
+    final cols = isMobile ? 1 : (isTablet ? 2 : 3);
 
     return Padding(
       padding: EdgeInsets.symmetric(
@@ -25,37 +27,68 @@ class ProjectsSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SectionHeader(
-            label: 'Portfolio',
-            titlePlain: 'Featured',
-            titleAccent: 'Projects',
-          ).animate().fadeIn(duration: 500.ms).slideY(begin: 0.2, end: 0),
-
-          const SizedBox(height: 40),
-
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final cols =
-                  constraints.maxWidth > 900 ? 3 : (isMobile ? 1 : 2);
-              return GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: cols,
-                  crossAxisSpacing: 24,
-                  mainAxisSpacing: 24,
-                  childAspectRatio: isMobile ? 1.2 : 0.9,
-                ),
-                itemCount: projects.length,
-                itemBuilder: (context, i) => _ProjectCard(project: projects[i])
-                    .animate()
-                    .fadeIn(delay: (i * 80).ms, duration: 400.ms)
-                    .slideY(begin: 0.15, end: 0),
-              );
-            },
+          RevealOnScroll(
+            key: const ValueKey('projects-header'),
+            slideY: 0.05,
+            child: const SectionHeader(
+              label: 'Portfolio',
+              titlePlain: 'Featured',
+              titleAccent: 'Projects',
+            ),
           ),
+          const SizedBox(height: 40),
+          _ProjectsGrid(projects: projects, cols: cols),
         ],
       ),
+    );
+  }
+}
+
+class _ProjectsGrid extends StatelessWidget {
+  final List<Project> projects;
+  final int cols;
+
+  const _ProjectsGrid({required this.projects, required this.cols});
+
+  @override
+  Widget build(BuildContext context) {
+    final rows = <List<Project>>[];
+    for (var i = 0; i < projects.length; i += cols) {
+      rows.add(projects.sublist(i, (i + cols).clamp(0, projects.length)));
+    }
+
+    return Column(
+      children: rows.asMap().entries.map((rowEntry) {
+        final rowIndex = rowEntry.key;
+        final row = rowEntry.value;
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 24),
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: row.asMap().entries.map((cardEntry) {
+                final cardIndex = cardEntry.key;
+                final project = cardEntry.value;
+                final globalIndex = rowIndex * cols + cardIndex;
+                return Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      left: cardIndex == 0 ? 0 : 12,
+                      right: cardIndex == row.length - 1 ? 0 : 12,
+                    ),
+                    child: RevealOnScroll(
+                      key: ValueKey('project-card-$globalIndex'),
+                      delay: Duration(milliseconds: globalIndex * 80),
+                      slideY: 0.05,
+                      child: _ProjectCard(project: project),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 }
@@ -98,16 +131,19 @@ class _ProjectCardState extends State<_ProjectCard> {
                 ]
               : [],
         ),
+        // ← No Expanded here — card sizes to content, IntrinsicHeight handles row height
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header
+            // Header strip
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               decoration: BoxDecoration(
                 color: colors.bg2,
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(20)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(20),
+                ),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -115,72 +151,57 @@ class _ProjectCardState extends State<_ProjectCard> {
                   Text(
                     widget.project.number,
                     style: GoogleFonts.syne(
-                      fontSize: 36,
+                      fontSize: 32,
                       fontWeight: FontWeight.w800,
-                      color: colors.border.withOpacity(4),
+                      // Use a fixed muted color — don't call withOpacity(4)
+                      color: colors.textPrimary.withOpacity(0.12),
                       letterSpacing: -0.04,
                     ),
                   ),
                   Text(
                     widget.project.emoji,
-                    style: const TextStyle(fontSize: 28),
+                    style: const TextStyle(fontSize: 26),
                   ),
                 ],
               ),
             ),
 
-            // Body
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.project.title,
-                      style: GoogleFonts.syne(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: colors.textPrimary,
-                        height: 1.3,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+            // Body — no Expanded, just padding + column
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.project.title,
+                    style: GoogleFonts.syne(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: colors.textPrimary,
+                      height: 1.3,
                     ),
-
-                    const SizedBox(height: 8),
-
-                    Expanded(
-                      child: Text(
-                        widget.project.description,
-                        style: GoogleFonts.dmSans(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w300,
-                          color: colors.textSecondary,
-                          height: 1.65,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 4,
-                      ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    widget.project.description,
+                    style: GoogleFonts.dmSans(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w300,
+                      color: colors.textSecondary,
+                      height: 1.65,
                     ),
-
-                    const SizedBox(height: 10),
-
-                    // Tags
-                    Wrap(
-                      spacing: 6,
-                      runSpacing: 6,
-                      children: widget.project.tags
-                          .map((t) => SkillTagChip(label: t))
-                          .toList(),
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    // Links
-                    _ProjectLinks(project: widget.project),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    children: widget.project.tags
+                        .map((t) => SkillTagChip(label: t))
+                        .toList(),
+                  ),
+                  const SizedBox(height: 14),
+                  _ProjectLinks(project: widget.project),
+                ],
               ),
             ),
           ],
@@ -202,8 +223,7 @@ class _ProjectLinks extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    final hasLinks =
-        project.githubUrl != null || project.demoUrl != null;
+    final hasLinks = project.githubUrl != null || project.demoUrl != null;
 
     if (!hasLinks) {
       return Text(
@@ -217,15 +237,16 @@ class _ProjectLinks extends StatelessWidget {
 
     return Wrap(
       spacing: 8,
+      runSpacing: 6,
       children: [
         if (project.githubUrl != null)
-          _LinkButton(
+          _LinkChip(
             label: 'GitHub',
             icon: Icons.code,
             onTap: () => _launch(project.githubUrl!),
           ),
         if (project.demoUrl != null)
-          _LinkButton(
+          _LinkChip(
             label: 'Live Demo',
             icon: Icons.open_in_new,
             onTap: () => _launch(project.demoUrl!),
@@ -235,12 +256,12 @@ class _ProjectLinks extends StatelessWidget {
   }
 }
 
-class _LinkButton extends StatelessWidget {
+class _LinkChip extends StatelessWidget {
   final String label;
   final IconData icon;
   final VoidCallback onTap;
 
-  const _LinkButton({
+  const _LinkChip({
     required this.label,
     required this.icon,
     required this.onTap,

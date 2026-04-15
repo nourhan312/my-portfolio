@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/extensions/context_extensions.dart';
+import '../../../../core/widgets/reveal_on_scroll.dart';
 import '../../domain/entities/portfolio_entities.dart';
 
 class HeroSection extends StatelessWidget {
@@ -24,104 +24,94 @@ class HeroSection extends StatelessWidget {
       ),
       child: Stack(
         children: [
-          // Background grid
-          Positioned.fill(child: _GridBackground()),
-
-          // Accent glow
+          Positioned.fill(
+            child: RepaintBoundary(
+              child: CustomPaint(
+                painter: _GridPainter(color: colors.border),
+              ),
+            ),
+          ),
           Positioned(
             top: -60,
             right: isMobile ? -80 : 0,
-            child: Container(
-              width: 500,
-              height: 500,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [
-                    colors.accent.withOpacity(0.07),
-                    Colors.transparent,
-                  ],
+            child: IgnorePointer(
+              child: Container(
+                width: 500,
+                height: 500,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      colors.accent.withOpacity(0.07),
+                      Colors.transparent,
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
-
-          // Content
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const SizedBox(height: 40),
-
-              // Available badge
-              _AvailableBadge()
-                  .animate()
-                  .fadeIn(delay: 100.ms, duration: 500.ms)
-                  .slideY(begin: 0.2, end: 0),
-
+              RevealOnScroll(
+                key: const ValueKey('hero-badge'),
+                delay: const Duration(milliseconds: 80),
+                slideY: 0.06,
+                child: const _AvailableBadge(),
+              ),
               const SizedBox(height: 28),
-
-              // Headline
-              _HeroHeadline(data: data)
-                  .animate()
-                  .fadeIn(delay: 200.ms, duration: 600.ms)
-                  .slideY(begin: 0.2, end: 0),
-
+              RevealOnScroll(
+                key: const ValueKey('hero-headline'),
+                delay: const Duration(milliseconds: 180),
+                slideY: 0.06,
+                child: _HeroHeadline(data: data),
+              ),
               const SizedBox(height: 24),
-
-              // Bio
-              ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 560),
-                child: Text(
-                  data.bio,
-                  style: GoogleFonts.dmSans(
-                    fontSize: isMobile ? 15 : 17,
-                    fontWeight: FontWeight.w300,
-                    color: colors.textSecondary,
-                    height: 1.75,
+              RevealOnScroll(
+                key: const ValueKey('hero-bio'),
+                delay: const Duration(milliseconds: 280),
+                slideY: 0.04,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 560),
+                  child: Text(
+                    data.bio,
+                    style: GoogleFonts.dmSans(
+                      fontSize: isMobile ? 15 : 17,
+                      fontWeight: FontWeight.w300,
+                      color: colors.textSecondary,
+                      height: 1.75,
+                    ),
                   ),
                 ),
-              ).animate().fadeIn(delay: 300.ms, duration: 600.ms),
-
+              ),
               const SizedBox(height: 32),
-
-              // CTAs
-              Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                children: [
-                  _PrimaryButton(label: 'View Projects', onTap: () {}),
-                  _OutlineButton(
-                    label: 'Get in Touch',
-                    onTap: () {},
-                  ),
-                ],
-              ).animate().fadeIn(delay: 400.ms, duration: 600.ms),
-
+              RevealOnScroll(
+                key: const ValueKey('hero-cta'),
+                delay: const Duration(milliseconds: 360),
+                slideY: 0.04,
+                child: const Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: [
+                    _PrimaryButton(label: 'View Projects'),
+                    _OutlineButton(label: 'Get in Touch'),
+                  ],
+                ),
+              ),
               const SizedBox(height: 52),
-
-              // Stats
-              _HeroStats(data: data)
-                  .animate()
-                  .fadeIn(delay: 500.ms, duration: 600.ms),
-
+              RevealOnScroll(
+                key: const ValueKey('hero-stats'),
+                delay: const Duration(milliseconds: 440),
+                slideY: 0.04,
+                child: _HeroStats(data: data),
+              ),
               const SizedBox(height: 40),
             ],
           ),
         ],
       ),
-    );
-  }
-}
-
-// ── sub-widgets ──────────────────────────────────────────────────────────────
-
-class _GridBackground extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.colors;
-    return CustomPaint(
-      painter: _GridPainter(color: colors.border),
     );
   }
 }
@@ -149,6 +139,8 @@ class _GridPainter extends CustomPainter {
 }
 
 class _AvailableBadge extends StatelessWidget {
+  const _AvailableBadge();
+
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
@@ -162,7 +154,7 @@ class _AvailableBadge extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _PulsingDot(),
+          const _PulsingDot(),
           const SizedBox(width: 8),
           Text(
             'Available for opportunities',
@@ -180,14 +172,16 @@ class _AvailableBadge extends StatelessWidget {
 }
 
 class _PulsingDot extends StatefulWidget {
+  const _PulsingDot();
+
   @override
   State<_PulsingDot> createState() => _PulsingDotState();
 }
 
 class _PulsingDotState extends State<_PulsingDot>
     with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _opacity;
+  late final AnimationController _controller;
+  late final Animation<double> _opacity;
 
   @override
   void initState() {
@@ -229,102 +223,126 @@ class _HeroHeadline extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final fontSize = context.isMobile ? 44.0 : 72.0;
-    final style = GoogleFonts.syne(
+    final base = GoogleFonts.syne(
       fontSize: fontSize,
       fontWeight: FontWeight.w800,
       letterSpacing: -0.03,
-      height: 1.0,
+      height: 1.05,
     );
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Flutter', style: style.copyWith(color: colors.textPrimary)),
+        Text('Flutter', style: base.copyWith(color: colors.textPrimary)),
         Text(
           'Developer &',
-          style: style.copyWith(
+          style: base.copyWith(
             color: colors.textSecondary,
             fontWeight: FontWeight.w400,
           ),
         ),
-        Text('Instructor', style: style.copyWith(color: colors.accent)),
+        Text('CS Graduate', style: base.copyWith(color: colors.accent)),
       ],
     );
   }
 }
 
-class _PrimaryButton extends StatelessWidget {
+class _PrimaryButton extends StatefulWidget {
   final String label;
-  final VoidCallback onTap;
-  const _PrimaryButton({required this.label, required this.onTap});
+  const _PrimaryButton({required this.label});
+
+  @override
+  State<_PrimaryButton> createState() => _PrimaryButtonState();
+}
+
+class _PrimaryButtonState extends State<_PrimaryButton> {
+  bool _hovered = false;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    return GestureDetector(
-      onTap: onTap,
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 13),
-          decoration: BoxDecoration(
-            color: colors.accent,
-            borderRadius: BorderRadius.circular(50),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                label,
-                style: GoogleFonts.dmSans(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white,
-                ),
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        transform: Matrix4.identity()
+          ..translate(0.0, _hovered ? -2.0 : 0.0),
+        padding:
+            const EdgeInsets.symmetric(horizontal: 28, vertical: 13),
+        decoration: BoxDecoration(
+          color: _hovered ? const Color(0xFF1A3FA0) : colors.accent,
+          borderRadius: BorderRadius.circular(50),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              widget.label,
+              style: GoogleFonts.dmSans(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: Colors.white,
               ),
-              const SizedBox(width: 8),
-              const Icon(Icons.arrow_forward, size: 14, color: Colors.white),
-            ],
-          ),
+            ),
+            const SizedBox(width: 8),
+            const Icon(Icons.arrow_forward, size: 14, color: Colors.white),
+          ],
         ),
       ),
     );
   }
 }
 
-class _OutlineButton extends StatelessWidget {
+class _OutlineButton extends StatefulWidget {
   final String label;
-  final VoidCallback onTap;
-  const _OutlineButton({required this.label, required this.onTap});
+  const _OutlineButton({required this.label});
+
+  @override
+  State<_OutlineButton> createState() => _OutlineButtonState();
+}
+
+class _OutlineButtonState extends State<_OutlineButton> {
+  bool _hovered = false;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    return GestureDetector(
-      onTap: onTap,
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(50),
-            border: Border.all(color: colors.border, width: 1.5),
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        transform: Matrix4.identity()
+          ..translate(0.0, _hovered ? -2.0 : 0.0),
+        padding:
+            const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(50),
+          border: Border.all(
+            color: _hovered ? colors.accent : colors.border,
+            width: 1.5,
           ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                label,
-                style: GoogleFonts.dmSans(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                  color: colors.textPrimary,
-                ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              widget.label,
+              style: GoogleFonts.dmSans(
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                color: _hovered ? colors.accent : colors.textPrimary,
               ),
-              const SizedBox(width: 8),
-              Icon(Icons.mail_outline, size: 14, color: colors.textPrimary),
-            ],
-          ),
+            ),
+            const SizedBox(width: 8),
+            Icon(
+              Icons.mail_outline,
+              size: 14,
+              color: _hovered ? colors.accent : colors.textPrimary,
+            ),
+          ],
         ),
       ),
     );
@@ -343,11 +361,12 @@ class _HeroStats extends StatelessWidget {
       children: [
         _StatItem(num: data.cgpa, suffix: '★', label: 'CGPA'),
         _StatItem(
-            num: data.classRank,
-            suffix: '',
-            label: 'Class Rank (3rd & 4th Year)'),
-        _StatItem(num: '5', suffix: '+', label: 'Apps Built'),
-        _StatItem(num: '3', suffix: '+', label: 'Years Flutter'),
+          num: data.classRank,
+          suffix: '',
+          label: 'Class Rank (3rd & 4th Year)',
+        ),
+        const _StatItem(num: '5', suffix: '+', label: 'Apps Built'),
+        const _StatItem(num: '3', suffix: '+', label: 'Years Flutter'),
       ],
     );
   }
@@ -357,7 +376,6 @@ class _StatItem extends StatelessWidget {
   final String num;
   final String suffix;
   final String label;
-
   const _StatItem({
     required this.num,
     required this.suffix,
@@ -384,14 +402,15 @@ class _StatItem extends StatelessWidget {
                 letterSpacing: -0.03,
               ),
             ),
-            Text(
-              suffix,
-              style: GoogleFonts.syne(
-                fontSize: 20,
-                fontWeight: FontWeight.w800,
-                color: colors.accent,
+            if (suffix.isNotEmpty)
+              Text(
+                suffix,
+                style: GoogleFonts.syne(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  color: colors.accent,
+                ),
               ),
-            ),
           ],
         ),
         Text(
@@ -400,7 +419,6 @@ class _StatItem extends StatelessWidget {
             fontSize: 12,
             color: colors.textHint,
             fontWeight: FontWeight.w400,
-            letterSpacing: 0.02,
           ),
         ),
       ],
