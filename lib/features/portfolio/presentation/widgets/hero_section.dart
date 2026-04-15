@@ -14,6 +14,7 @@ class HeroSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final isMobile = context.isMobile;
+    final isTablet = context.isTablet;
 
     return Container(
       width: double.infinity,
@@ -50,65 +51,157 @@ class HeroSection extends StatelessWidget {
               ),
             ),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const SizedBox(height: 40),
-              RevealOnScroll(
-                key: const ValueKey('hero-badge'),
-                delay: const Duration(milliseconds: 80),
-                slideY: 0.06,
-                child: const _AvailableBadge(),
-              ),
-              const SizedBox(height: 28),
-              RevealOnScroll(
-                key: const ValueKey('hero-headline'),
-                delay: const Duration(milliseconds: 180),
-                slideY: 0.06,
-                child: _HeroHeadline(data: data),
-              ),
-              const SizedBox(height: 24),
-              RevealOnScroll(
-                key: const ValueKey('hero-bio'),
-                delay: const Duration(milliseconds: 280),
-                slideY: 0.04,
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 560),
-                  child: Text(
-                    data.bio,
-                    style: GoogleFonts.dmSans(
-                      fontSize: isMobile ? 15 : 17,
-                      fontWeight: FontWeight.w300,
-                      color: colors.textSecondary,
-                      height: 1.75,
-                    ),
+          Center(
+            child: isMobile
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 40),
+                      RevealOnScroll(
+                        key: const ValueKey('hero-badge'),
+                        delay: const Duration(milliseconds: 80),
+                        slideY: 0.06,
+                        child: const _AvailableBadge(),
+                      ),
+                      const SizedBox(height: 28),
+                      RevealOnScroll(
+                        key: const ValueKey('hero-headline'),
+                        delay: const Duration(milliseconds: 180),
+                        slideY: 0.06,
+                        child: _HeroHeadline(data: data),
+                      ),
+                      const SizedBox(height: 22),
+                      RevealOnScroll(
+                        key: const ValueKey('hero-photo-mobile'),
+                        delay: const Duration(milliseconds: 220),
+                        slideY: 0.06,
+                        child: _HeroPortrait(data: data),
+                      ),
+                      const SizedBox(height: 24),
+                      RevealOnScroll(
+                        key: const ValueKey('hero-bio'),
+                        delay: const Duration(milliseconds: 280),
+                        slideY: 0.04,
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 560),
+                          child: Text(
+                            data.bio,
+                            style: GoogleFonts.dmSans(
+                              fontSize: isMobile ? 15 : 17,
+                              fontWeight: FontWeight.w300,
+                              color: colors.textSecondary,
+                              height: 1.75,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+                      RevealOnScroll(
+                        key: const ValueKey('hero-cta'),
+                        delay: const Duration(milliseconds: 360),
+                        slideY: 0.04,
+                        child: const Wrap(
+                          spacing: 12,
+                          runSpacing: 12,
+                          children: [
+                            _PrimaryButton(label: 'View Projects'),
+                            _OutlineButton(label: 'Get in Touch'),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 52),
+                      RevealOnScroll(
+                        key: const ValueKey('hero-stats'),
+                        delay: const Duration(milliseconds: 440),
+                        slideY: 0.04,
+                        child: _HeroStats(data: data),
+                      ),
+                      const SizedBox(height: 40),
+                    ],
+                  )
+                : Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        flex: 6,
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 680),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const SizedBox(height: 40),
+                              RevealOnScroll(
+                                key: const ValueKey('hero-badge'),
+                                delay: const Duration(milliseconds: 80),
+                                slideY: 0.06,
+                                child: const _AvailableBadge(),
+                              ),
+                              const SizedBox(height: 28),
+                              RevealOnScroll(
+                                key: const ValueKey('hero-headline'),
+                                delay: const Duration(milliseconds: 180),
+                                slideY: 0.06,
+                                child: _HeroHeadline(data: data),
+                              ),
+                              const SizedBox(height: 24),
+                              RevealOnScroll(
+                                key: const ValueKey('hero-bio'),
+                                delay: const Duration(milliseconds: 280),
+                                slideY: 0.04,
+                                child: ConstrainedBox(
+                                  constraints:
+                                      const BoxConstraints(maxWidth: 560),
+                                  child: Text(
+                                    data.bio,
+                                    style: GoogleFonts.dmSans(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w300,
+                                      color: colors.textSecondary,
+                                      height: 1.75,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 32),
+                              RevealOnScroll(
+                                key: const ValueKey('hero-cta'),
+                                delay: const Duration(milliseconds: 360),
+                                slideY: 0.04,
+                                child: const Wrap(
+                                  spacing: 12,
+                                  runSpacing: 12,
+                                  children: [
+                                    _PrimaryButton(label: 'View Projects'),
+                                    _OutlineButton(label: 'Get in Touch'),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 52),
+                              RevealOnScroll(
+                                key: const ValueKey('hero-stats'),
+                                delay: const Duration(milliseconds: 440),
+                                slideY: 0.04,
+                                child: _HeroStats(data: data),
+                              ),
+                              const SizedBox(height: 40),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: isTablet ? 28 : 56),
+                      Expanded(
+                        flex: 4,
+                        child: RevealOnScroll(
+                          key: const ValueKey('hero-photo-desktop'),
+                          delay: const Duration(milliseconds: 220),
+                          slideY: 0.06,
+                          child: _HeroPortrait(data: data),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ),
-              const SizedBox(height: 32),
-              RevealOnScroll(
-                key: const ValueKey('hero-cta'),
-                delay: const Duration(milliseconds: 360),
-                slideY: 0.04,
-                child: const Wrap(
-                  spacing: 12,
-                  runSpacing: 12,
-                  children: [
-                    _PrimaryButton(label: 'View Projects'),
-                    _OutlineButton(label: 'Get in Touch'),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 52),
-              RevealOnScroll(
-                key: const ValueKey('hero-stats'),
-                delay: const Duration(milliseconds: 440),
-                slideY: 0.04,
-                child: _HeroStats(data: data),
-              ),
-              const SizedBox(height: 40),
-            ],
           ),
         ],
       ),
@@ -223,6 +316,7 @@ class _HeroHeadline extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final fontSize = context.isMobile ? 44.0 : 72.0;
+    final nameSize = context.isMobile ? 34.0 : 52.0;
     final base = GoogleFonts.syne(
       fontSize: fontSize,
       fontWeight: FontWeight.w800,
@@ -232,16 +326,121 @@ class _HeroHeadline extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Flutter', style: base.copyWith(color: colors.textPrimary)),
         Text(
-          'Developer &',
-          style: base.copyWith(
+          'I am',
+          style: GoogleFonts.dmSans(
+            fontSize: context.isMobile ? 14 : 16,
+            fontWeight: FontWeight.w500,
             color: colors.textSecondary,
-            fontWeight: FontWeight.w400,
+            letterSpacing: 1.2,
           ),
         ),
-        Text('CS Graduate', style: base.copyWith(color: colors.accent)),
+        const SizedBox(height: 10),
+        Text(
+          data.name,
+          style: base.copyWith(color: colors.textPrimary),
+        ),
+        Text(
+          data.title,
+          style: GoogleFonts.dmSans(
+            fontSize: nameSize * 0.52,
+            fontWeight: FontWeight.w500,
+            letterSpacing: 0.3,
+            color: colors.accent,
+            height: 1.2,
+          ),
+        ),
       ],
+    );
+  }
+}
+
+class _HeroPortrait extends StatelessWidget {
+  final PortfolioData data;
+  const _HeroPortrait({required this.data});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final photoUrl = data.photoUrl;
+    final avatarSize =
+        context.isMobile ? 220.0 : (context.isTablet ? 250.0 : 300.0);
+    final initials = data.name
+        .split(RegExp(r'\s+'))
+        .where((part) => part.isNotEmpty)
+        .take(2)
+        .map((part) => part[0].toUpperCase())
+        .join();
+
+    return Align(
+      alignment: context.isMobile ? Alignment.center : Alignment.centerRight,
+      child: SizedBox(
+        width: avatarSize,
+        height: avatarSize,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                colors.accent.withValues(alpha: 0.9),
+                colors.accent.withValues(alpha: 0.45),
+              ],
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: colors.accent.withValues(alpha: 0.24),
+                blurRadius: 36,
+                spreadRadius: 2,
+                offset: const Offset(0, 18),
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(7),
+            child: ClipOval(
+              child: photoUrl == null || photoUrl.isEmpty
+                  ? _PortraitFallback(initials: initials)
+                  : Image.network(
+                      photoUrl,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) =>
+                          _PortraitFallback(initials: initials),
+                    ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PortraitFallback extends StatelessWidget {
+  final String initials;
+  const _PortraitFallback({required this.initials});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [colors.tagBg, colors.border],
+        ),
+      ),
+      child: Center(
+        child: Text(
+          initials,
+          style: GoogleFonts.syne(
+            fontSize: 58,
+            fontWeight: FontWeight.w700,
+            color: colors.textSecondary,
+          ),
+        ),
+      ),
     );
   }
 }
@@ -266,10 +465,8 @@ class _PrimaryButtonState extends State<_PrimaryButton> {
       onExit: (_) => setState(() => _hovered = false),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
-        transform: Matrix4.identity()
-          ..translate(0.0, _hovered ? -2.0 : 0.0),
-        padding:
-            const EdgeInsets.symmetric(horizontal: 28, vertical: 13),
+        transform: Matrix4.identity()..translate(0.0, _hovered ? -2.0 : 0.0),
+        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 13),
         decoration: BoxDecoration(
           color: _hovered ? const Color(0xFF1A3FA0) : colors.accent,
           borderRadius: BorderRadius.circular(50),
@@ -314,10 +511,8 @@ class _OutlineButtonState extends State<_OutlineButton> {
       onExit: (_) => setState(() => _hovered = false),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
-        transform: Matrix4.identity()
-          ..translate(0.0, _hovered ? -2.0 : 0.0),
-        padding:
-            const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
+        transform: Matrix4.identity()..translate(0.0, _hovered ? -2.0 : 0.0),
+        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(50),
           border: Border.all(

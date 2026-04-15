@@ -66,6 +66,7 @@ class Achievement {
 class PortfolioData {
   final String name;
   final String title;
+  final String? photoUrl;
   final String bio;
   final String location;
   final String email;
@@ -82,6 +83,7 @@ class PortfolioData {
   const PortfolioData({
     required this.name,
     required this.title,
+    this.photoUrl,
     required this.bio,
     required this.location,
     required this.email,
