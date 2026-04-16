@@ -7,7 +7,7 @@ class PortfolioLocalDataSource {
     return const PortfolioData(
       name: 'Nourhan Ayman',
       title: 'Flutter Developer',
-      photoUrl: 'https://github.com/Nourhan.png',
+      photoUrl: 'assets/ii.jpg',
       bio:
           'I am a junior Flutter developer and instructor from Egypt, focused on building clean, responsive mobile apps. '
           'I enjoy mentoring students while growing my skills in architecture, state management, and great UI.',

@@ -35,9 +35,96 @@ class ExperienceSection extends StatelessWidget {
               titleAccent: 'Training',
             ),
           ),
+          const SizedBox(height: 16),
+          RevealOnScroll(
+            key: const ValueKey('exp-highlights'),
+            delay: const Duration(milliseconds: 80),
+            slideY: 0.04,
+            child: _ExperienceHighlights(experiences: experiences),
+          ),
           const SizedBox(height: 40),
           _Timeline(experiences: experiences),
         ],
+      ),
+    );
+  }
+}
+
+class _ExperienceHighlights extends StatelessWidget {
+  final List<Experience> experiences;
+
+  const _ExperienceHighlights({required this.experiences});
+
+  @override
+  Widget build(BuildContext context) {
+    final currentCount = experiences
+        .where((e) => e.period.toLowerCase().contains('present'))
+        .length;
+    final trainingCount = experiences
+        .where(
+          (e) =>
+              e.role.toLowerCase().contains('trainee') ||
+              e.role.toLowerCase().contains('training'),
+        )
+        .length;
+
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      children: [
+        _InfoPill(label: 'Current Roles', value: currentCount.toString()),
+        _InfoPill(label: 'Total Roles', value: experiences.length.toString()),
+        _InfoPill(label: 'Training', value: trainingCount.toString()),
+      ],
+    );
+  }
+}
+
+class _InfoPill extends StatelessWidget {
+  final String label;
+  final String value;
+
+  const _InfoPill({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.96, end: 1),
+      duration: const Duration(milliseconds: 380),
+      curve: Curves.easeOut,
+      builder: (context, t, child) {
+        return Transform.scale(scale: t, child: child);
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: colors.card,
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: colors.border),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              value,
+              style: GoogleFonts.syne(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: colors.accent,
+              ),
+            ),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: GoogleFonts.dmSans(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: colors.textSecondary,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -50,7 +137,6 @@ class _Timeline extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.colors;
     final sortedExperiences = experiences.toList()
       ..sort((a, b) => _compareByPeriod(a.period, b.period));
 
@@ -152,7 +238,7 @@ class _Timeline extends StatelessWidget {
   }
 }
 
-class _TimelineItem extends StatelessWidget {
+class _TimelineItem extends StatefulWidget {
   final Experience experience;
   final bool isFirst;
   final bool hasLine;
@@ -164,9 +250,17 @@ class _TimelineItem extends StatelessWidget {
   });
 
   @override
+  State<_TimelineItem> createState() => _TimelineItemState();
+}
+
+class _TimelineItemState extends State<_TimelineItem> {
+  bool _hovered = false;
+
+  @override
   Widget build(BuildContext context) {
     final colors = context.colors;
     final isMobile = context.isMobile;
+    final experience = widget.experience;
     final isCurrent = experience.period.toLowerCase().contains('present');
     final isTraining = experience.role.toLowerCase().contains('trainee') ||
         experience.role.toLowerCase().contains('training');
@@ -182,8 +276,8 @@ class _TimelineItem extends StatelessWidget {
               children: [
                 const SizedBox(height: 18),
                 Container(
-                  width: experience.isPrimary ? 14 : 11,
-                  height: experience.isPrimary ? 14 : 11,
+                  width: experience.isPrimary ? (_hovered ? 16 : 14) : 11,
+                  height: experience.isPrimary ? (_hovered ? 16 : 14) : 11,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: experience.isPrimary ? colors.accent : colors.card,
@@ -203,14 +297,17 @@ class _TimelineItem extends StatelessWidget {
                         : null,
                   ),
                 ),
-                if (hasLine)
-                  Container(
+                if (widget.hasLine)
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
                     width: 2,
                     height: 132,
                     margin: const EdgeInsets.only(top: 8),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(99),
-                      color: colors.border,
+                      color: _hovered
+                          ? colors.accent.withValues(alpha: 0.35)
+                          : colors.border,
                     ),
                   ),
               ],
@@ -218,65 +315,99 @@ class _TimelineItem extends StatelessWidget {
           ),
           const SizedBox(width: 14),
           Expanded(
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-              decoration: BoxDecoration(
-                color: colors.card,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: colors.border),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  isMobile
-                      ? Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _RoleText(experience: experience),
-                            const SizedBox(height: 4),
-                            _DateText(period: experience.period),
-                          ],
-                        )
-                      : Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(child: _RoleText(experience: experience)),
-                            const SizedBox(width: 12),
-                            _DateText(period: experience.period),
-                          ],
-                        ),
-                  const SizedBox(height: 6),
-                  Text(
-                    experience.company,
-                    style: GoogleFonts.dmSans(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                      color: colors.accent,
+            child: MouseRegion(
+              onEnter: (_) => setState(() => _hovered = true),
+              onExit: (_) => setState(() => _hovered = false),
+              child: AnimatedSlide(
+                duration: const Duration(milliseconds: 220),
+                curve: Curves.easeOut,
+                offset: _hovered && !isMobile
+                    ? const Offset(0, -0.01)
+                    : Offset.zero,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 220),
+                  curve: Curves.easeOut,
+                  padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+                  decoration: BoxDecoration(
+                    color: colors.card,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: _hovered
+                          ? colors.accent.withValues(alpha: 0.5)
+                          : colors.border,
                     ),
+                    boxShadow: _hovered
+                        ? [
+                            BoxShadow(
+                              color: colors.accent.withValues(alpha: 0.13),
+                              blurRadius: 18,
+                              offset: const Offset(0, 10),
+                            ),
+                          ]
+                        : null,
                   ),
-                  const SizedBox(height: 10),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if (isFirst) const _MiniBadge(label: 'Latest Role'),
-                      if (isCurrent)
-                        const _MiniBadge(label: 'Current', highlighted: true),
-                      _MiniBadge(label: isTraining ? 'Training' : 'Experience'),
+                      isMobile
+                          ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _RoleText(experience: experience),
+                                const SizedBox(height: 4),
+                                _DateText(period: experience.period),
+                              ],
+                            )
+                          : Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: _RoleText(experience: experience),
+                                ),
+                                const SizedBox(width: 12),
+                                _DateText(period: experience.period),
+                              ],
+                            ),
+                      const SizedBox(height: 6),
+                      Text(
+                        experience.company,
+                        style: GoogleFonts.dmSans(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: colors.accent,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          if (widget.isFirst)
+                            const _MiniBadge(label: 'Latest Role'),
+                          if (isCurrent)
+                            const _MiniBadge(
+                              label: 'Current',
+                              highlighted: true,
+                            ),
+                          _MiniBadge(
+                            label: isTraining ? 'Training' : 'Experience',
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        experience.description,
+                        style: GoogleFonts.dmSans(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w300,
+                          color: colors.textSecondary,
+                          height: 1.7,
+                        ),
+                      ),
                     ],
                   ),
-                  const SizedBox(height: 10),
-                  Text(
-                    experience.description,
-                    style: GoogleFonts.dmSans(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w300,
-                      color: colors.textSecondary,
-                      height: 1.7,
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
           ),

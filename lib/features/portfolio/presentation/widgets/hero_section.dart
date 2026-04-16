@@ -43,7 +43,7 @@ class HeroSection extends StatelessWidget {
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
                     colors: [
-                      colors.accent.withOpacity(0.07),
+                      colors.accent.withValues(alpha: 0.07),
                       Colors.transparent,
                     ],
                   ),
@@ -355,17 +355,52 @@ class _HeroHeadline extends StatelessWidget {
   }
 }
 
-class _HeroPortrait extends StatelessWidget {
+class _HeroPortrait extends StatefulWidget {
   final PortfolioData data;
   const _HeroPortrait({required this.data});
 
   @override
+  State<_HeroPortrait> createState() => _HeroPortraitState();
+}
+
+class _HeroPortraitState extends State<_HeroPortrait>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _floatY;
+  late final Animation<double> _pulse;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 3200),
+    )..repeat(reverse: true);
+
+    _floatY = Tween<double>(begin: -4, end: 8).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+    _pulse = Tween<double>(begin: 0.98, end: 1.03).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    final photoUrl = data.photoUrl;
+    final photoUrl = widget.data.photoUrl;
+    final isAssetPhoto = photoUrl != null &&
+        photoUrl.isNotEmpty &&
+        photoUrl.startsWith('assets/');
     final avatarSize =
         context.isMobile ? 220.0 : (context.isTablet ? 250.0 : 300.0);
-    final initials = data.name
+    final initials = widget.data.name
         .split(RegExp(r'\s+'))
         .where((part) => part.isNotEmpty)
         .take(2)
@@ -374,41 +409,73 @@ class _HeroPortrait extends StatelessWidget {
 
     return Align(
       alignment: context.isMobile ? Alignment.center : Alignment.centerRight,
-      child: SizedBox(
-        width: avatarSize,
-        height: avatarSize,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                colors.accent.withValues(alpha: 0.9),
-                colors.accent.withValues(alpha: 0.45),
-              ],
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: colors.accent.withValues(alpha: 0.24),
-                blurRadius: 36,
-                spreadRadius: 2,
-                offset: const Offset(0, 18),
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          return Transform.translate(
+            offset: Offset(0, _floatY.value),
+            child: child,
+          );
+        },
+        child: SizedBox(
+          width: avatarSize,
+          height: avatarSize,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              ScaleTransition(
+                scale: _pulse,
+                child: Container(
+                  width: avatarSize,
+                  height: avatarSize,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: colors.accent.withValues(alpha: 0.12),
+                  ),
+                ),
+              ),
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      colors.accent.withValues(alpha: 0.9),
+                      colors.accent.withValues(alpha: 0.45),
+                    ],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: colors.accent.withValues(alpha: 0.24),
+                      blurRadius: 36,
+                      spreadRadius: 2,
+                      offset: const Offset(0, 18),
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(7),
+                  child: ClipOval(
+                    child: photoUrl == null || photoUrl.isEmpty
+                        ? _PortraitFallback(initials: initials)
+                        : isAssetPhoto
+                            ? Image.asset(
+                                photoUrl,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) =>
+                                    _PortraitFallback(initials: initials),
+                              )
+                            : Image.network(
+                                photoUrl,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) =>
+                                    _PortraitFallback(initials: initials),
+                              ),
+                  ),
+                ),
               ),
             ],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(7),
-            child: ClipOval(
-              child: photoUrl == null || photoUrl.isEmpty
-                  ? _PortraitFallback(initials: initials)
-                  : Image.network(
-                      photoUrl,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) =>
-                          _PortraitFallback(initials: initials),
-                    ),
-            ),
           ),
         ),
       ),

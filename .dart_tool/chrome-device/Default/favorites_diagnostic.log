@@ -161,3 +161,7 @@
 2026-04-13 22:20:19.633: [INFO] BookmarkNodeAdded, ABU: 0
 2026-04-13 22:20:19.634: [INFO] BookmarkNodeAdded, ABU: 0
 2026-04-13 22:20:29.448: [INFO] Sync initialization duration: 16966ms
+2026-04-15 23:16:58.446: [INFO] VisibilityChanged: 0
+2026-04-15 23:16:58.513: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-04-15 23:16:58.513: [INFO] OnDoneLoading sync enabled: 1
+2026-04-15 23:17:01.486: [INFO] Sync initialization duration: 2966ms
