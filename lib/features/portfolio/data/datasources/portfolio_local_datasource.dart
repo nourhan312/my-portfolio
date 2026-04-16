@@ -87,6 +87,22 @@ class PortfolioLocalDataSource {
       ],
       experiences: [
         Experience(
+          role: 'Flutter Instructor',
+          company: '3C Creative Children Community · Remote',
+          period: 'Nov 2025 – Present',
+          description:
+              'Teaching Flutter development via interactive sessions, guiding students in building and debugging mobile apps.',
+          isPrimary: true,
+        ),
+        Experience(
+          role: 'Session Lead – DECI Program',
+          company: 'Udacity · Remote',
+          period: 'July 2025 – Present',
+          description:
+              'Led weekly sessions for the Programming Fundamentals Nanodegree. Supported 91.7% of students to graduate with a feedback score of 9.4/10.',
+          isPrimary: true,
+        ),
+        Experience(
           role: 'Flutter Developer Intern',
           company: 'Link Development · Remote',
           period: 'Dec 2025 – Feb 2026',
@@ -101,22 +117,6 @@ class PortfolioLocalDataSource {
           description:
               'Led a team of 5 building a Courier Delivery System using Flutter in 1 month, accelerating the development lifecycle by 75%.',
           isPrimary: true,
-        ),
-        Experience(
-          role: 'Session Lead – DECI Program',
-          company: 'Udacity · Remote',
-          period: 'July 2025 – Present',
-          description:
-              'Led weekly sessions for the Programming Fundamentals Nanodegree. Supported 91.7% of students to graduate with a feedback score of 9.4/10.',
-          isPrimary: true,
-        ),
-        Experience(
-          role: 'Flutter Instructor',
-          company: '3C Creative Children Community · Remote',
-          period: 'Nov 2025 – Present',
-          description:
-              'Teaching Flutter development via interactive sessions, guiding students in building and debugging mobile apps.',
-          isPrimary: false,
         ),
         Experience(
           role: 'Multiple Training Programs (ITIDA · DEPI · ITI)',
