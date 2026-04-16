@@ -23,6 +23,7 @@ class PortfolioPage extends StatefulWidget {
 
 class _PortfolioPageState extends State<PortfolioPage> {
   final _scrollController = ScrollController();
+  bool _showMoveToTop = false;
 
   // Section keys for scroll-to navigation
   final _heroKey = GlobalKey();
@@ -35,12 +36,31 @@ class _PortfolioPageState extends State<PortfolioPage> {
   void initState() {
     super.initState();
     context.read<PortfolioCubit>().load();
+    _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
+    _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     super.dispose();
+  }
+
+  void _onScroll() {
+    if (!_scrollController.hasClients) return;
+    final shouldShow = _scrollController.offset > 360;
+    if (shouldShow != _showMoveToTop) {
+      setState(() => _showMoveToTop = shouldShow);
+    }
+  }
+
+  Future<void> _scrollToTop() async {
+    if (!_scrollController.hasClients) return;
+    await _scrollController.animateTo(
+      0,
+      duration: const Duration(milliseconds: 700),
+      curve: Curves.easeOutCubic,
+    );
   }
 
   void _scrollTo(String section) {
@@ -79,10 +99,11 @@ class _PortfolioPageState extends State<PortfolioPage> {
 
           // Navbar pinned on top — only theme toggle needs Bloc access
           Positioned(
-            top: 0, left: 0, right: 0,
+            top: 0,
+            left: 0,
+            right: 0,
             child: BlocSelector<PortfolioCubit, PortfolioState, bool>(
-              selector: (state) =>
-                  state is PortfolioLoaded && state.isDark,
+              selector: (state) => state is PortfolioLoaded && state.isDark,
               builder: (context, isDark) => PortfolioNavBar(
                 isDark: isDark,
                 onThemeToggle: () =>
@@ -91,7 +112,83 @@ class _PortfolioPageState extends State<PortfolioPage> {
               ),
             ),
           ),
+          Positioned(
+            right: context.isMobile ? 20 : 28,
+            bottom: context.isMobile ? 20 : 28,
+            child: _MoveToTopButton(
+              visible: _showMoveToTop,
+              onTap: _scrollToTop,
+            ),
+          ),
         ],
+      ),
+    );
+  }
+}
+
+class _MoveToTopButton extends StatefulWidget {
+  final bool visible;
+  final VoidCallback onTap;
+
+  const _MoveToTopButton({required this.visible, required this.onTap});
+
+  @override
+  State<_MoveToTopButton> createState() => _MoveToTopButtonState();
+}
+
+class _MoveToTopButtonState extends State<_MoveToTopButton> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return IgnorePointer(
+      ignoring: !widget.visible,
+      child: AnimatedSlide(
+        duration: const Duration(milliseconds: 260),
+        curve: Curves.easeOut,
+        offset: widget.visible ? Offset.zero : const Offset(0, 0.5),
+        child: AnimatedOpacity(
+          duration: const Duration(milliseconds: 220),
+          opacity: widget.visible ? 1 : 0,
+          child: MouseRegion(
+            cursor: SystemMouseCursors.click,
+            onEnter: (_) => setState(() => _hovered = true),
+            onExit: (_) => setState(() => _hovered = false),
+            child: GestureDetector(
+              onTap: widget.onTap,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 180),
+                curve: Curves.easeOut,
+                width: 54,
+                height: 54,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      colors.accent,
+                      colors.accent.withValues(alpha: 0.7),
+                    ],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: colors.accent.withValues(alpha: 0.35),
+                      blurRadius: _hovered ? 18 : 14,
+                      offset: Offset(0, _hovered ? 8 : 6),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  Icons.keyboard_double_arrow_up_rounded,
+                  color: Colors.white,
+                  size: _hovered ? 28 : 26,
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
