@@ -10,6 +10,7 @@
         "flutter",
         "flutter_bloc",
         "get_it",
+        "gh_pages",
         "go_router",
         "google_fonts",
         "url_launcher",
@@ -55,6 +56,15 @@
         "stream_channel",
         "test_api",
         "vector_math"
+      ]
+    },
+    {
+      "name": "gh_pages",
+      "version": "0.1.1",
+      "dependencies": [
+        "args",
+        "git",
+        "path"
       ]
     },
     {
@@ -269,6 +279,18 @@
         "string_scanner",
         "term_glyph"
       ]
+    },
+    {
+      "name": "git",
+      "version": "2.3.2",
+      "dependencies": [
+        "path"
+      ]
+    },
+    {
+      "name": "args",
+      "version": "2.7.0",
+      "dependencies": []
     },
     {
       "name": "url_launcher_windows",
@@ -750,11 +772,6 @@
         "async",
         "path"
       ]
-    },
-    {
-      "name": "args",
-      "version": "2.7.0",
-      "dependencies": []
     },
     {
       "name": "mime",
