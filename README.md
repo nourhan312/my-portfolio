@@ -1,17 +1,32 @@
 # nourhan_portfolio
 
-A new Flutter project.
+Portfolio website built with Flutter.
 
-## Getting Started
+## Why the deployed site can fail on GitHub Pages
 
-This project is a starting point for a Flutter application.
+This project is hosted under a subpath:
 
-A few resources to get you started if this is your first Flutter project:
+- `https://nourhan312.github.io/Portfolio/`
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+For GitHub Pages subpath hosting, Flutter web **must** be built with:
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- `--base-href /Portfolio/`
+
+If you build without this flag, generated files point to `/` and the app fails to load correctly.
+
+## Build for GitHub Pages
+
+```powershell
+flutter clean
+flutter pub get
+flutter build web --release --base-href /Portfolio/
+```
+
+Then deploy the contents of `build/web` to GitHub Pages.
+
+## Local run
+
+```powershell
+flutter pub get
+flutter run -d chrome
+```
