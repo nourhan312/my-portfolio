@@ -24,6 +24,7 @@ class PortfolioPage extends StatefulWidget {
 class _PortfolioPageState extends State<PortfolioPage> {
   final _scrollController = ScrollController();
   bool _showMoveToTop = false;
+  bool _showStartupSplash = true;
 
   // Section keys for scroll-to navigation
   final _heroKey = GlobalKey();
@@ -37,6 +38,10 @@ class _PortfolioPageState extends State<PortfolioPage> {
     super.initState();
     context.read<PortfolioCubit>().load();
     _scrollController.addListener(_onScroll);
+    Future<void>.delayed(const Duration(milliseconds: 1700), () {
+      if (!mounted) return;
+      setState(() => _showStartupSplash = false);
+    });
   }
 
   @override
@@ -121,7 +126,123 @@ class _PortfolioPageState extends State<PortfolioPage> {
               onTap: _scrollToTop,
             ),
           ),
+          Positioned.fill(
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 450),
+              switchInCurve: Curves.easeOut,
+              switchOutCurve: Curves.easeIn,
+              child: _showStartupSplash
+                  ? const _StartupSplashOverlay(key: ValueKey('startup'))
+                  : const SizedBox.shrink(key: ValueKey('content')),
+            ),
+          ),
         ],
+      ),
+    );
+  }
+}
+
+class _StartupSplashOverlay extends StatefulWidget {
+  const _StartupSplashOverlay({super.key});
+
+  @override
+  State<_StartupSplashOverlay> createState() => _StartupSplashOverlayState();
+}
+
+class _StartupSplashOverlayState extends State<_StartupSplashOverlay>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _pulseController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [colors.bg, colors.bg2],
+        ),
+      ),
+      child: Center(
+        child: AnimatedBuilder(
+          animation: _pulseController,
+          builder: (context, child) {
+            final dots = '.' * (_pulseController.value * 3 + 1).floor();
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Transform.scale(
+                  scale: 0.95 + (_pulseController.value * 0.08),
+                  child: Container(
+                    width: 108,
+                    height: 108,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(28),
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          colors.accent,
+                          colors.accent.withValues(alpha: 0.7),
+                        ],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: colors.accent.withValues(alpha: 0.35),
+                          blurRadius: 22,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      'NA',
+                      style: GoogleFonts.dmSans(
+                        fontSize: 36,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 22),
+                Text(
+                  'Nourhan Ayman',
+                  style: GoogleFonts.dmSans(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: colors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Loading$dots',
+                  style: GoogleFonts.dmSans(
+                    fontSize: 14,
+                    color: colors.textSecondary,
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }
@@ -270,10 +391,38 @@ class _LoadingView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            CircularProgressIndicator(color: colors.accent, strokeWidth: 2),
-            const SizedBox(height: 16),
+            Container(
+              width: 76,
+              height: 76,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                gradient: LinearGradient(
+                  colors: [colors.accent, colors.accent.withValues(alpha: 0.7)],
+                ),
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                'NA',
+                style: GoogleFonts.dmSans(
+                  fontSize: 26,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            const SizedBox(height: 18),
+            SizedBox(
+              width: 180,
+              child: LinearProgressIndicator(
+                color: colors.accent,
+                backgroundColor: colors.accent.withValues(alpha: 0.16),
+                borderRadius: BorderRadius.circular(99),
+                minHeight: 4,
+              ),
+            ),
+            const SizedBox(height: 14),
             Text(
-              'Loading portfolio...',
+              'Preparing portfolio...',
               style: GoogleFonts.dmSans(
                 fontSize: 14,
                 color: colors.textHint,
