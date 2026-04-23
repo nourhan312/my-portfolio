@@ -9,13 +9,12 @@ class PortfolioLocalDataSource {
       title: 'Flutter Developer',
       photoUrl: 'assets/ii.jpg',
       bio:
-          'I am a junior Flutter developer and instructor from Egypt, focused on building clean, responsive mobile apps. '
-          'I enjoy mentoring students while growing my skills in architecture, state management, and great UI.',
+          'Flutter developer and instructor from Egypt, focused on building production-ready mobile experiences. '
+          'I work with clean architecture, scalable state management, and polished UI to deliver reliable apps from idea to release.',
       location: 'Banha, Egypt',
       email: 'nourhanayman3120@gmail.com',
-      phone: '+20 106 233 0858',
-      linkedIn: 'https://linkedin.com/in/Nourhan',
-      github: 'https://github.com/Nourhan',
+      linkedIn: 'https://www.linkedin.com/in/nourhan-ayman-33281230a/',
+      github: 'https://github.com/nourhan312',
       cgpa: '3.73',
       classRank: '#1',
       skills: [

@@ -21,7 +21,6 @@ class ContactSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final isMobile = context.isMobile;
-    final hasPhone = data.phone.trim().isNotEmpty;
 
     return Container(
       color: colors.bg2,
@@ -75,17 +74,6 @@ class ContactSection extends StatelessWidget {
                   onTap: () => _launch('mailto:${data.email}'),
                 ),
               ),
-              if (hasPhone)
-                RevealOnScroll(
-                  key: const ValueKey('contact-phone'),
-                  delay: const Duration(milliseconds: 220),
-                  slideY: 0.04,
-                  child: _ContactLink(
-                    icon: Icons.phone_outlined,
-                    label: data.phone,
-                    onTap: () => _launch('tel:${data.phone}'),
-                  ),
-                ),
               RevealOnScroll(
                 key: const ValueKey('contact-linkedin'),
                 delay: const Duration(milliseconds: 280),

@@ -23,7 +23,6 @@ PortfolioData _fakeData() => const PortfolioData(
       bio: 'Bio',
       location: 'Egypt',
       email: 'test@test.com',
-      phone: '01000000000',
       linkedIn: 'https://linkedin.com',
       github: 'https://github.com',
       cgpa: '3.73',

@@ -70,7 +70,6 @@ class PortfolioData {
   final String bio;
   final String location;
   final String email;
-  final String phone;
   final String linkedIn;
   final String github;
   final String cgpa;
@@ -87,7 +86,6 @@ class PortfolioData {
     required this.bio,
     required this.location,
     required this.email,
-    required this.phone,
     required this.linkedIn,
     required this.github,
     required this.cgpa,

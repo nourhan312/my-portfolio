@@ -31,8 +31,8 @@ class EducationSection extends StatelessWidget {
             slideY: 0.05,
             child: const SectionHeader(
               label: 'Academic Background',
-              titlePlain: '',
-              titleAccent: 'Education',
+              titlePlain: 'Education &',
+              titleAccent: 'Research Impact',
             ),
           ),
           const SizedBox(height: 40),
@@ -92,7 +92,7 @@ class _EduContent extends StatelessWidget {
         Text(
           'Bachelor of Computer Science',
           style: GoogleFonts.syne(
-            fontSize: 18,
+            fontSize: 20,
             fontWeight: FontWeight.w700,
             color: colors.textPrimary,
           ),
@@ -111,14 +111,24 @@ class _EduContent extends StatelessWidget {
           spacing: 20,
           children: [
             Text('2021 – 2025',
-                style: GoogleFonts.dmSans(
-                    fontSize: 12, color: colors.textHint)),
+                style:
+                    GoogleFonts.dmSans(fontSize: 12, color: colors.textHint)),
             Text('Banha, Egypt',
-                style: GoogleFonts.dmSans(
-                    fontSize: 12, color: colors.textHint)),
+                style:
+                    GoogleFonts.dmSans(fontSize: 12, color: colors.textHint)),
             Text('CGPA: ${data.cgpa}',
-                style: GoogleFonts.dmSans(
-                    fontSize: 12, color: colors.textHint)),
+                style:
+                    GoogleFonts.dmSans(fontSize: 12, color: colors.textHint)),
+          ],
+        ),
+        const SizedBox(height: 14),
+        Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          children: [
+            _MetricChip(label: 'Class Rank', value: data.classRank),
+            _MetricChip(label: 'Graduation Project', value: 'A+'),
+            _MetricChip(label: 'Focus', value: 'Flutter + AI'),
           ],
         ),
         const SizedBox(height: 16),
@@ -127,7 +137,7 @@ class _EduContent extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: colors.bg2,
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(14),
             border: Border(
               left: BorderSide(color: colors.accent, width: 3),
             ),
@@ -155,6 +165,48 @@ class _EduContent extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _MetricChip extends StatelessWidget {
+  final String label;
+  final String value;
+
+  const _MetricChip({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: colors.card,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: colors.border),
+      ),
+      child: RichText(
+        text: TextSpan(
+          children: [
+            TextSpan(
+              text: '$label: ',
+              style: GoogleFonts.dmSans(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: colors.textSecondary,
+              ),
+            ),
+            TextSpan(
+              text: value,
+              style: GoogleFonts.dmSans(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: colors.accent,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
