@@ -23,16 +23,24 @@ class SectionHeader extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label.toUpperCase(),
-          style: GoogleFonts.dmSans(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            letterSpacing: 0.12,
-            color: colors.accent,
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          decoration: BoxDecoration(
+            color: colors.tagBg,
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(color: colors.border),
+          ),
+          child: Text(
+            label.toUpperCase(),
+            style: GoogleFonts.dmSans(
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.1,
+              color: colors.accent,
+            ),
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 12),
         if (titlePlain.isEmpty)
           Text(
             titleAccent,

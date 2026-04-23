@@ -18,7 +18,7 @@ class App extends StatelessWidget {
         selector: (state) => state is PortfolioLoaded && state.isDark,
         builder: (context, isDark) {
           return MaterialApp(
-            title: 'Nourhan Ayman — Flutter Developer',
+            title: 'Nourhan Ayman | Flutter Developer Portfolio',
             debugShowCheckedModeBanner: false,
             theme: AppTheme.light(),
             darkTheme: AppTheme.dark(),

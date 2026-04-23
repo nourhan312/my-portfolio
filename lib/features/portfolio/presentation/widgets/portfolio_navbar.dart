@@ -20,34 +20,47 @@ class PortfolioNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     return Container(
-      height: 60,
+      height: 68,
       padding: EdgeInsets.symmetric(
         horizontal: context.isMobile ? 20 : 64,
       ),
       decoration: BoxDecoration(
-        color: colors.bg.withOpacity(0.88),
+        color: colors.bg.withValues(alpha: 0.9),
         border: Border(
           bottom: BorderSide(color: colors.border, width: 1),
         ),
       ),
       child: Row(
         children: [
-          // Logo
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: colors.tagBg,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: colors.border),
+            ),
+            child: Row(
+              children: [
+                Text(
+                  'NA',
+                  style: GoogleFonts.syne(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 12,
+                    color: colors.accent,
+                    letterSpacing: 0.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 10),
           Text(
-            'Nourhan',
+            'Nourhan Ayman',
             style: GoogleFonts.syne(
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w700,
               fontSize: 17,
               color: colors.textPrimary,
               letterSpacing: -0.02,
-            ),
-          ),
-          Text(
-            '.',
-            style: GoogleFonts.syne(
-              fontWeight: FontWeight.w800,
-              fontSize: 17,
-              color: colors.accent,
             ),
           ),
 
@@ -119,7 +132,7 @@ class _NavLink extends StatelessWidget {
             label,
             style: GoogleFonts.dmSans(
               fontSize: 14,
-              fontWeight: FontWeight.w400,
+              fontWeight: FontWeight.w500,
               color: colors.textSecondary,
             ),
           ),

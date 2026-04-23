@@ -21,6 +21,7 @@ class ContactSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final isMobile = context.isMobile;
+    final hasPhone = data.phone.trim().isNotEmpty;
 
     return Container(
       color: colors.bg2,
@@ -49,7 +50,7 @@ class ContactSection extends StatelessWidget {
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 520),
               child: Text(
-                'Open to Flutter developer roles, collaborations, and exciting new projects.',
+                'Open to Flutter developer opportunities, product collaborations, and impactful mobile projects.',
                 style: GoogleFonts.dmSans(
                   fontSize: 15,
                   fontWeight: FontWeight.w300,
@@ -74,16 +75,17 @@ class ContactSection extends StatelessWidget {
                   onTap: () => _launch('mailto:${data.email}'),
                 ),
               ),
-              RevealOnScroll(
-                key: const ValueKey('contact-phone'),
-                delay: const Duration(milliseconds: 220),
-                slideY: 0.04,
-                child: _ContactLink(
-                  icon: Icons.phone_outlined,
-                  label: data.phone,
-                  onTap: () => _launch('tel:${data.phone}'),
+              if (hasPhone)
+                RevealOnScroll(
+                  key: const ValueKey('contact-phone'),
+                  delay: const Duration(milliseconds: 220),
+                  slideY: 0.04,
+                  child: _ContactLink(
+                    icon: Icons.phone_outlined,
+                    label: data.phone,
+                    onTap: () => _launch('tel:${data.phone}'),
+                  ),
                 ),
-              ),
               RevealOnScroll(
                 key: const ValueKey('contact-linkedin'),
                 delay: const Duration(milliseconds: 280),
@@ -141,20 +143,19 @@ class _ContactLinkState extends State<_ContactLink> {
         onTap: widget.onTap,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
-          padding:
-              const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
           decoration: BoxDecoration(
             color: colors.card,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(14),
             border: Border.all(
               color: _hovered ? colors.accent : colors.border,
             ),
             boxShadow: _hovered
                 ? [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.06),
-                      blurRadius: 16,
-                      offset: const Offset(0, 4),
+                      color: colors.accent.withValues(alpha: 0.14),
+                      blurRadius: 18,
+                      offset: const Offset(0, 6),
                     )
                   ]
                 : [],

@@ -24,12 +24,13 @@ class SkillTagChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: bgColor ?? colors.tagBg,
         borderRadius: BorderRadius.circular(50),
+        border: Border.all(color: colors.border),
       ),
       child: Text(
         label,
         style: GoogleFonts.dmSans(
           fontSize: 12,
-          fontWeight: FontWeight.w500,
+          fontWeight: FontWeight.w600,
           color: textColor ?? colors.tagText,
         ),
       ),

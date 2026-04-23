@@ -116,7 +116,7 @@ class _ProjectCardState extends State<_ProjectCard> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         transform: Matrix4.identity()
-          ..translate(0.0, _hovered ? -4.0 : 0.0),
+          ..translateByDouble(0.0, _hovered ? -4.0 : 0.0, 0.0, 1.0),
         decoration: BoxDecoration(
           color: colors.card,
           borderRadius: BorderRadius.circular(20),
@@ -124,9 +124,9 @@ class _ProjectCardState extends State<_ProjectCard> {
           boxShadow: _hovered
               ? [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 30,
-                    offset: const Offset(0, 8),
+                    color: colors.accent.withValues(alpha: 0.14),
+                    blurRadius: 26,
+                    offset: const Offset(0, 10),
                   )
                 ]
               : [],
@@ -137,10 +137,16 @@ class _ProjectCardState extends State<_ProjectCard> {
           children: [
             // Header strip
             Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               decoration: BoxDecoration(
-                color: colors.bg2,
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    colors.accent.withValues(alpha: 0.12),
+                    colors.bg2,
+                  ],
+                ),
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(20),
                 ),
@@ -154,7 +160,7 @@ class _ProjectCardState extends State<_ProjectCard> {
                       fontSize: 32,
                       fontWeight: FontWeight.w800,
                       // Use a fixed muted color — don't call withOpacity(4)
-                      color: colors.textPrimary.withOpacity(0.12),
+                      color: colors.textPrimary.withValues(alpha: 0.12),
                       letterSpacing: -0.04,
                     ),
                   ),

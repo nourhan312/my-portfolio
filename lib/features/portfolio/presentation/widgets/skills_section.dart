@@ -107,8 +107,15 @@ class _SkillCard extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: colors.card,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(color: colors.border),
+        boxShadow: [
+          BoxShadow(
+            color: colors.accent.withValues(alpha: 0.05),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -117,7 +124,14 @@ class _SkillCard extends StatelessWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: colors.tagBg,
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  colors.accent.withValues(alpha: 0.18),
+                  colors.accent.withValues(alpha: 0.08),
+                ],
+              ),
               borderRadius: BorderRadius.circular(12),
             ),
             alignment: Alignment.center,
@@ -130,12 +144,12 @@ class _SkillCard extends StatelessWidget {
           Text(
             category.label,
             style: GoogleFonts.syne(
-              fontSize: 14,
+              fontSize: 15,
               fontWeight: FontWeight.w700,
               color: colors.textPrimary,
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           Wrap(
             spacing: 6,
             runSpacing: 6,
