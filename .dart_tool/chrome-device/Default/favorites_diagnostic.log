@@ -171,3 +171,7 @@
 2026-04-23 22:29:13.758: [INFO] Primary account changed.
 2026-04-23 22:29:13.758: [INFO] OnPrimaryAccountChanged PrimaryAccountChangeEvent::Type::kSet
 2026-04-23 22:29:27.428: [INFO] Sync initialization duration: 17037ms
+2026-04-23 23:21:55.362: [INFO] VisibilityChanged: 0
+2026-04-23 23:21:55.433: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-04-23 23:21:55.433: [INFO] OnDoneLoading sync enabled: 1
+2026-04-23 23:21:58.564: [INFO] Sync initialization duration: 3124ms
