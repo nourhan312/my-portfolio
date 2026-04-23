@@ -1,32 +1,37 @@
 # nourhan_portfolio
 
-Portfolio website built with Flutter.
+Flutter portfolio project ready for GitHub Pages deployment.
 
-## Why the deployed site can fail on GitHub Pages
+## Live site
 
-This project is hosted under a subpath:
+When published to GitHub Pages, the site will be available at:
 
-- `https://nourhan312.github.io/Portfolio/`
+`https://nourhan312.github.io/my-portfolio/`
 
-For GitHub Pages subpath hosting, Flutter web **must** be built with:
+## Deploy to GitHub Pages
 
-- `--base-href /Portfolio/`
-
-If you build without this flag, generated files point to `/` and the app fails to load correctly.
-
-## Build for GitHub Pages
+1. Push this project to the GitHub repository:
 
 ```powershell
-flutter clean
-flutter pub get
-flutter build web --release --base-href /Portfolio/
+git remote add origin https://github.com/nourhan312/my-portfolio.git
+git branch -M main
+git push -u origin main
 ```
 
-Then deploy the contents of `build/web` to GitHub Pages.
+2. In GitHub repository settings:
+   - Go to **Settings -> Pages**
+   - Set **Source** to **GitHub Actions**
 
-## Local run
+3. If GitHub shows environment protection for `github-pages`:
+   - Go to **Settings -> Environments -> github-pages**
+   - Allow deployment from `main` or temporarily remove branch restrictions
+
+4. Re-run the workflow in the **Actions** tab if needed.
+
+## Local development
 
 ```powershell
 flutter pub get
 flutter run -d chrome
 ```
+
